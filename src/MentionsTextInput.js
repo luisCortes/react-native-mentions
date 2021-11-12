@@ -16,7 +16,6 @@ export default class MentionsTextInput extends Component {
             textInputHeight: '',
             isTrackingStarted: false,
             suggestionRowHeight: new Animated.Value(0),
-
         };
         this.isTrackingStarted = false;
         this.previousChar = ' ';
@@ -35,6 +34,13 @@ export default class MentionsTextInput extends Component {
             const numOfRows = nextProps.MaxVisibleRowCount >= nextProps.suggestionsData.length ? nextProps.suggestionsData.length : nextProps.MaxVisibleRowCount;
             const height = numOfRows * nextProps.suggestionRowHeight;
             this.openSuggestionsPanel(height);
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (this.props.forceOnChangeText && this.props.resetForceOnChangeText && (typeof this.props.resetForceOnChangeText === 'function')) {
+            this.onChangeText(this.props.forceOnChangeText);
+            this.props.resetForceOnChangeText();
         }
     }
 
@@ -110,37 +116,37 @@ export default class MentionsTextInput extends Component {
         }
         return (
             <View>
-                <Animated.View
-                    style={[{...this.props.suggestionsPanelStyle}, {height: this.state.suggestionRowHeight}]}>
-                    <FlatList
-                        keyboardShouldPersistTaps={'always'}
-                        horizontal={this.props.horizontal}
-                        ListEmptyComponent={this.props.loadingComponent}
-                        enableEmptySections={true}
-                        data={this.props.suggestionsData}
-                        keyExtractor={this.props.keyExtractor}
-                        renderItem={(rowData) => {
-                            return this.props.renderSuggestionsRow(rowData, this.stopTracking.bind(this));
-                        }}
-                    />
-                </Animated.View>
-                <TextInput
-                    {...props}
-                    onContentSizeChange={(event) => {
-                        this.setState({
-                            textInputHeight: this.props.textInputMinHeight >= event.nativeEvent.contentSize.height ? this.props.textInputMinHeight : event.nativeEvent.contentSize.height + 10,
-                        });
-                    }}
-                    ref={component => this._textInput = component}
-                    onChangeText={this.onChangeText.bind(this)}
-                    multiline={true}
-                    style={[{...this.props.textInputStyle}, {height: Math.min(this.props.textInputMaxHeight, this.state.textInputHeight)}]}
-                    placeholder={this.props.placeholder ? this.props.placeholder : 'Write a comment...'}
-                >
-                    {this.props.children}
-                </TextInput>
+            <Animated.View
+        style={[{...this.props.suggestionsPanelStyle}, {height: this.state.suggestionRowHeight}]}>
+    <FlatList
+        keyboardShouldPersistTaps={'always'}
+        horizontal={this.props.horizontal}
+        ListEmptyComponent={this.props.loadingComponent}
+        enableEmptySections={true}
+        data={this.props.suggestionsData}
+        keyExtractor={this.props.keyExtractor}
+        renderItem={(rowData) => {
+            return this.props.renderSuggestionsRow(rowData, this.stopTracking.bind(this));
+        }}
+        />
+        </Animated.View>
+        <TextInput
+        {...props}
+        onContentSizeChange={(event) => {
+            this.setState({
+                textInputHeight: this.props.textInputMinHeight >= event.nativeEvent.contentSize.height ? this.props.textInputMinHeight : event.nativeEvent.contentSize.height + 10,
+            });
+        }}
+        ref={component => this._textInput = component}
+        onChangeText={this.onChangeText.bind(this)}
+        multiline={true}
+        style={[{...this.props.textInputStyle}, {height: Math.min(this.props.textInputMaxHeight, this.state.textInputHeight)}]}
+        placeholder={this.props.placeholder ? this.props.placeholder : 'Write a comment...'}
+            >
+            {this.props.children}
+            </TextInput>
             </View>
-        );
+    );
     }
 }
 
@@ -179,7 +185,7 @@ MentionsTextInput.defaultProps = {
     textInputStyle: {borderColor: '#ebebeb', borderWidth: 1, fontSize: 15},
     suggestionsPanelStyle: {backgroundColor: 'rgba(100,100,100,0.1)'},
     loadingComponent: () => <Text>Loading...</Text>,
-    textInputMinHeight: 30,
+textInputMinHeight: 30,
     textInputMaxHeight: 80,
     horizontal: true,
 };
