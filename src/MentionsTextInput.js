@@ -137,7 +137,13 @@ export default class MentionsTextInput extends Component {
                 textInputHeight: this.props.textInputMinHeight >= event.nativeEvent.contentSize.height ? this.props.textInputMinHeight : event.nativeEvent.contentSize.height + 10,
             });
         }}
-        ref={component => this._textInput = component}
+        ref={component => {
+            if (this.props._inputRef && (typeof this.props._inputRef === 'function')) {
+                this.props._inputRef(component);
+            } else {
+                this._textInput = component;
+            }
+        }}
         onChangeText={this.onChangeText.bind(this)}
         multiline={true}
         style={[{...this.props.textInputStyle}, {height: Math.min(this.props.textInputMaxHeight, this.state.textInputHeight)}]}
